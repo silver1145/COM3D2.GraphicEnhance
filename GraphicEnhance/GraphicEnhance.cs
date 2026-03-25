@@ -107,7 +107,7 @@ namespace COM3D2.GraphicEnhance
                 ShapekeyEnhance.deltaFullSyncInterval = ShapekeyEnhanceFullSyncInterval.Value;
             };
             ShapekeyEnhance.deltaFullSyncInterval = ShapekeyEnhanceFullSyncInterval.Value;
-            ShapekeyEnhanceBlendPosNormFix = Config.Bind("ShapekeyEnhance", "DeltaModeBlendPosNormFix", true, "Fix with some shapekey plugin");
+            ShapekeyEnhanceBlendPosNormFix = Config.Bind("ShapekeyEnhance", "DeltaModeBlendPosNormFix", false, "Fix with some shapekey plugin");
             ShapekeyEnhanceBlendPosNormFix.SettingChanged += (sender, args) => {
                 ShapekeyEnhance.deltaBlendPosNormFix = ShapekeyEnhanceBlendPosNormFix.Value;
             };
