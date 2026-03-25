@@ -14,10 +14,10 @@ namespace COM3D2.GraphicEnhance
         static IntPtr threadPool = IntPtr.Zero;
         internal static int threadPoolSize = 1;
 
-        [DllImport("Kernel32.dll")]
+        [DllImport("Kernel32.dll", SetLastError = true)]
         private static extern IntPtr LoadLibrary(string path);
 
-        [DllImport("Kernel32.dll")]
+        [DllImport("Kernel32.dll", SetLastError = true)]
         private static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
 
         public static Delegate LoadFunction<T>(string functionName)

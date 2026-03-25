@@ -137,13 +137,19 @@ namespace COM3D2.GraphicEnhance.Util
                     pLastWeightsPosNorm = Marshal.AllocHGlobal(weightsBytes);
                 pDeltaWeights = Marshal.AllocHGlobal(weightsBytes);
                 float* lwp = (float*)pLastWeightsPos;
-                float* lwpn = (float*)pLastWeightsPosNorm;
                 float* dw = (float*)pDeltaWeights;
                 for (int i = 0; i < morphCount; i++)
                 {
                     lwp[i] = 0f;
-                    lwpn[i] = 0f;
                     dw[i] = 0f;
+                }
+                if (pLastWeightsPosNorm != IntPtr.Zero)
+                {
+                    float* lwpn = (float*)pLastWeightsPosNorm;
+                    for (int i = 0; i < morphCount; i++)
+                    {
+                        lwpn[i] = 0f;
+                    }
                 }
             }
 

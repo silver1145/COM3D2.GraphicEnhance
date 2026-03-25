@@ -2,6 +2,7 @@
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using System;
 using UnityEngine;
 
 namespace COM3D2.GraphicEnhance
@@ -70,65 +71,68 @@ namespace COM3D2.GraphicEnhance
         private void InitConfig()
         {
             // Global
-            int coreNum = GraphicPatch.GetLogicalProcessorCount();
-            threadPoolSize = Config.Bind("Global", "ThreadPoolSize (Need Restart)", coreNum - 1, new ConfigDescription("Thread Pool Size (Need Restart)", new AcceptableValueRange<int>(1, coreNum)));
+            int maxPoolSize = GraphicPatch.GetLogicalProcessorCount();
+            int defaultPoolSize = Math.Max(maxPoolSize - 1, 1);
+            threadPoolSize = Config.Bind("Global", "ThreadPoolSize", defaultPoolSize, new ConfigDescription("Thread Pool Size (Need Restart)", new AcceptableValueRange<int>(1, maxPoolSize)));
             if (threadPoolSize.Value <= 0)
             {
-                threadPoolSize.Value = coreNum - 1;
+                threadPoolSize.Value = defaultPoolSize;
             }
-            if (threadPoolSize.Value > coreNum)
+            if (threadPoolSize.Value > maxPoolSize)
             {
-                threadPoolSize.Value = coreNum;
+                threadPoolSize.Value = maxPoolSize;
             }
             // SkinEnhance
             SkinMethodConfig = Config.Bind("SkinEnhance", "SkinMethod", SkinMethod.LBS, "Skin Method");
+            SkinMethodSwitchHotkeyModifier = Config.Bind("SkinEnhance", "SwitchHotkeyModifier", KeyCode.None, "Hotkey Modifier Key");
+            SkinMethodSwitchHotkeyKey = Config.Bind("SkinEnhance", "SwitchHotkeyKey", KeyCode.None, "Hotkey Main Key");
             SkinMethodConfig.SettingChanged += (sender, args) => {
                 GraphicPatch.SetSwitchDqsOn(SkinMethodConfig.Value == SkinMethod.DQS);
             };
             GraphicPatch.SetSwitchDqsOn(SkinMethodConfig.Value == SkinMethod.DQS);
-            SkinMethodSwitchHotkeyModifier = Config.Bind("SkinEnhance", "SwitchHotkeyModifier", KeyCode.None, "Hotkey Modifier Key");
-            SkinMethodSwitchHotkeyKey = Config.Bind("SkinEnhance", "SwitchHotkeyKey", KeyCode.None, "Hotkey Main Key");
             // ShapekeyEnhance
             ShapekeyEnhanceEnable = Config.Bind("ShapekeyEnhance", "_GlobalEnable", true, "Global Switch");
+            ShapekeyEnhanceMethod = Config.Bind("ShapekeyEnhance", "ShapekeyMethod", ShapekeyMethod.Delta, "Shapekey Enhance Method");
+            ShapekeyEnhanceFullSyncInterval = Config.Bind("ShapekeyEnhance", "DeltaModeFullSyncInterval", 120, "Delta Mode Full Sync Interval (s)");
+            ShapekeyEnhanceBlendPosNormFix = Config.Bind("ShapekeyEnhance", "DeltaModeBlendPosNormFix", false, "Fix with some shapekey plugin");
             ShapekeyEnhanceEnable.SettingChanged += (sender, args) =>
             {
                 ShapekeyEnhance.globalEnable = ShapekeyEnhanceEnable.Value;
             };
-            ShapekeyEnhanceMethod = Config.Bind("ShapekeyEnhance", "Method", ShapekeyMethod.Delta, "Shapekey Enhance Method");
             ShapekeyEnhanceMethod.SettingChanged += (sender, args) => {
                 ShapekeyEnhance.shapekeyMethod = ShapekeyEnhanceMethod.Value;
                 if (ShapekeyEnhance.shapekeyMethod == ShapekeyMethod.Delta)
                     ShapekeyEnhance.lastSyncTime = (int)Time.realtimeSinceStartup;
             };
-            if (ShapekeyEnhance.shapekeyMethod == ShapekeyMethod.Delta)
-                ShapekeyEnhance.lastSyncTime = (int)Time.realtimeSinceStartup;
-            ShapekeyEnhanceFullSyncInterval = Config.Bind("ShapekeyEnhance", "DeltaModeFullSyncInterval (s)", 120, "Delta Mode Full Sync Interval (s)");
             ShapekeyEnhanceFullSyncInterval.SettingChanged += (sender, args) => {
                 ShapekeyEnhance.deltaFullSyncInterval = ShapekeyEnhanceFullSyncInterval.Value;
             };
-            ShapekeyEnhance.deltaFullSyncInterval = ShapekeyEnhanceFullSyncInterval.Value;
-            ShapekeyEnhanceBlendPosNormFix = Config.Bind("ShapekeyEnhance", "DeltaModeBlendPosNormFix", false, "Fix with some shapekey plugin");
             ShapekeyEnhanceBlendPosNormFix.SettingChanged += (sender, args) => {
                 ShapekeyEnhance.deltaBlendPosNormFix = ShapekeyEnhanceBlendPosNormFix.Value;
             };
+            ShapekeyEnhance.globalEnable = ShapekeyEnhanceEnable.Value;
+            ShapekeyEnhance.shapekeyMethod = ShapekeyEnhanceMethod.Value;
+            if (ShapekeyEnhance.shapekeyMethod == ShapekeyMethod.Delta)
+                ShapekeyEnhance.lastSyncTime = (int)Time.realtimeSinceStartup;
+            ShapekeyEnhance.deltaFullSyncInterval = ShapekeyEnhanceFullSyncInterval.Value;
             ShapekeyEnhance.deltaBlendPosNormFix = ShapekeyEnhanceBlendPosNormFix.Value;
             // TextureCache
             TextureCacheEnable = Config.Bind("TextureCache", "_GlobalEnable", true, "Global Switch");
             TextureCacheAlwaysLoadCheck = Config.Bind("TextureCache", "AlwaysLoadCheck", false, "Always Load Check");
-            TextureCache.globalEnable = TextureCacheEnable.Value;
-            TextureCache.alwaysLoadCheck = TextureCacheAlwaysLoadCheck.Value;
             TextureCacheEnable.SettingChanged += (sender, args) => {
                 TextureCache.globalEnable = TextureCacheEnable.Value;
             };
             TextureCacheAlwaysLoadCheck.SettingChanged += (sender, args) => {
                 TextureCache.alwaysLoadCheck = TextureCacheAlwaysLoadCheck.Value;
             };
+            TextureCache.globalEnable = TextureCacheEnable.Value;
+            TextureCache.alwaysLoadCheck = TextureCacheAlwaysLoadCheck.Value;
             // TextureExtend
             TextureExtendEnable = Config.Bind("TextureExtend", "_GlobalEnable", true, "Global Switch");
-            TextureExtend.globalEnable = TextureExtendEnable.Value;
             TextureExtendEnable.SettingChanged += (sender, args) => {
                 TextureExtend.globalEnable = TextureExtendEnable.Value;
             };
+            TextureExtend.globalEnable = TextureExtendEnable.Value;
         }
 
         private void Update()
