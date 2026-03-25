@@ -89,7 +89,11 @@ namespace COM3D2.GraphicEnhance
             SkinMethodSwitchHotkeyModifier = Config.Bind("SkinEnhance", "SwitchHotkeyModifier", KeyCode.None, "Hotkey Modifier Key");
             SkinMethodSwitchHotkeyKey = Config.Bind("SkinEnhance", "SwitchHotkeyKey", KeyCode.None, "Hotkey Main Key");
             // ShapekeyEnhance
-            ShapekeyEnhanceEnable = Config.Bind("ShapekeyEnhance", "GlobalEnable", true, "Global Switch");
+            ShapekeyEnhanceEnable = Config.Bind("ShapekeyEnhance", "_GlobalEnable", true, "Global Switch");
+            ShapekeyEnhanceEnable.SettingChanged += (sender, args) =>
+            {
+                ShapekeyEnhance.globalEnable = ShapekeyEnhanceEnable.Value;
+            };
             ShapekeyEnhanceMethod = Config.Bind("ShapekeyEnhance", "Method", ShapekeyMethod.Delta, "Shapekey Enhance Method");
             ShapekeyEnhanceMethod.SettingChanged += (sender, args) => {
                 ShapekeyEnhance.shapekeyMethod = ShapekeyEnhanceMethod.Value;
@@ -109,7 +113,7 @@ namespace COM3D2.GraphicEnhance
             };
             ShapekeyEnhance.deltaBlendPosNormFix = ShapekeyEnhanceBlendPosNormFix.Value;
             // TextureCache
-            TextureCacheEnable = Config.Bind("TextureCache", "GlobalEnable", true, "Global Switch");
+            TextureCacheEnable = Config.Bind("TextureCache", "_GlobalEnable", true, "Global Switch");
             TextureCacheAlwaysLoadCheck = Config.Bind("TextureCache", "AlwaysLoadCheck", false, "Always Load Check");
             TextureCache.globalEnable = TextureCacheEnable.Value;
             TextureCache.alwaysLoadCheck = TextureCacheAlwaysLoadCheck.Value;
@@ -120,7 +124,7 @@ namespace COM3D2.GraphicEnhance
                 TextureCache.alwaysLoadCheck = TextureCacheAlwaysLoadCheck.Value;
             };
             // TextureExtend
-            TextureExtendEnable = Config.Bind("TextureExtend", "GlobalEnable", true, "Global Switch");
+            TextureExtendEnable = Config.Bind("TextureExtend", "_GlobalEnable", true, "Global Switch");
             TextureExtend.globalEnable = TextureExtendEnable.Value;
             TextureExtendEnable.SettingChanged += (sender, args) => {
                 TextureExtend.globalEnable = TextureExtendEnable.Value;

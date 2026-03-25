@@ -1,0 +1,37 @@
+name: Build and Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore COM3D2.GraphicEnhance.sln
+
+      - name: Build solution (Release x64)
+        run: msbuild COM3D2.GraphicEnhance.sln /p:Configuration=Release /p:Platform=x64 /m
+
+      - name: Package artifacts
+        run: |
+          New-Item -Path "staging/plugins/COM3D2.GraphicEnhance" -ItemType Directory -Force
+          Copy-Item "GraphicEnhance/bin/Release/net3.5/COM3D2.GraphicEnhance.dll" "staging/plugins/COM3D2.GraphicEnhance/"
+          Copy-Item "GraphicEnhance/bin/Release/net3.5/GraphicPatch.dll" "staging/plugins/COM3D2.GraphicEnhance/"
+          Compress-Archive -Path "staging/plugins" -DestinationPath "COM3D2.GraphicEnhance.zip"
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: COM3D2.GraphicEnhance.zip
