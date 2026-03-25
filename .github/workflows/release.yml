@@ -22,7 +22,7 @@ jobs:
         run: nuget restore COM3D2.GraphicEnhance.sln
 
       - name: Build solution (Release x64)
-        run: msbuild COM3D2.GraphicEnhance.sln /p:Configuration=Release /p:Platform=x64 /m
+        run: msbuild COM3D2.GraphicEnhance.sln /p:Configuration=Release /p:Platform=x64 /p:PlatformToolset=v143 /m
 
       - name: Package artifacts
         run: |
